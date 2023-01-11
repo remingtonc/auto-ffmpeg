@@ -1,7 +1,6 @@
 FROM docker.io/intel/oneapi-basekit AS builder
 RUN apt-get update -qq \
     && apt-get -y install \
-        libdevel \
         autoconf \
         automake \
         build-essential \
@@ -26,6 +25,7 @@ RUN apt-get update -qq \
         wget \
         yasm \
         zlib1g-dev \
+        libgnutls28-dev \
     && mkdir -p ~/ffmpeg_sources ~/bin
 # nasm is 2.15 in jammy so has avx-512 and unlikely to have qs specials, just install
 RUN apt-get install -y nasm libfdk-aac-dev
