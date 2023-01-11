@@ -1,6 +1,7 @@
 FROM docker.io/intel/oneapi-basekit AS builder
 RUN apt-get update -qq \
     && apt-get -y install \
+        libdevel \
         autoconf \
         automake \
         build-essential \
