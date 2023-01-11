@@ -19,7 +19,6 @@ RUN apt-get update -qq \
         wget \
         yasm \
         zlib1g-dev \
-        gnutls \
         libunistring-dev \
     && mkdir -p ~/ffmpeg_sources ~/bin
 # nasm is 2.15 in jammy so has avx-512 and unlikely to have qs specials, just install
