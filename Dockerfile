@@ -36,7 +36,7 @@ RUN cd ~/ffmpeg_sources \
     && PATH="$HOME/bin:$PATH" make -j$(($(nproc)-1)) \
     && make install
 # Compile libx265
-RUN apt-get install libnuma-dev \
+RUN apt-get install -y libnuma-dev \
     && cd ~/ffmpeg_sources \
     && wget -O x265.tar.bz2 https://bitbucket.org/multicoreware/x265_git/get/master.tar.bz2 \
     && tar xjvf x265.tar.bz2 \
