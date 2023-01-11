@@ -82,3 +82,4 @@ RUN apt-get update && apt-get -y install libass9 libfdk-aac2 libnuma1
 COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
 COPY --from=builder /root/bin/* /usr/local/bin/
 ENTRYPOINT /usr/local/bin/ffmpeg
+CMD ['--help']
