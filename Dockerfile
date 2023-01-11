@@ -105,5 +105,5 @@ RUN apt-get update \
     && make install
 COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
 COPY --from=builder /root/bin/* /usr/local/bin/
-ENTRYPOINT /usr/local/bin/ffmpeg
-CMD ['--help']
+ENTRYPOINT ["/usr/local/bin/ffmpeg"]
+CMD ["-h"]
