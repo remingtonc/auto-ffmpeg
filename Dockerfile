@@ -49,6 +49,18 @@ RUN cd ~/ffmpeg_sources \
     && meson setup -Denable_tests=false -Denable_docs=false --buildtype=release --default-library=static .. --prefix "$HOME/ffmpeg_build" --bindir="$HOME/ffmpeg_build/bin" --libdir="$HOME/ffmpeg_build/lib" \
     && ninja -j$(($(nproc)-1)) \
     && ninja install
+# Uhh let's try installing the GPU kit
+RUN apt-get update \
+    && apt-get -y install \
+        cmake \
+        libdrm-dev libdrm-intel1 \
+        libva-dev libva2 libva-drm2 \
+    && git clone https://github.com/oneapi-src/oneVPL-intel-gpu ~/onevpl-gpu \
+    && cd ~/onevpl-gpu \
+    && mkdir build && cd build \
+    && cmake .. \
+    && make -j1 \
+    && make install
 # Compile ffmpeg with only a couple enabled features
 RUN cd ~/ffmpeg_sources \
     && wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 \
@@ -79,6 +91,18 @@ RUN cd ~/ffmpeg_sources \
 FROM docker.io/intel/oneapi-basekit
 # What we didn't compile ends up needing to be installed
 RUN apt-get update && apt-get -y install libass9 libfdk-aac2 libnuma1
+# Uhh let's try installing the GPU kit
+RUN apt-get update \
+    && apt-get -y install \
+        cmake \
+        libdrm-dev libdrm-intel1 \
+        libva-dev libva2 libva-drm2 \
+    && git clone https://github.com/oneapi-src/oneVPL-intel-gpu ~/onevpl-gpu \
+    && cd ~/onevpl-gpu \
+    && mkdir build && cd build \
+    && cmake .. \
+    && make -j1 \
+    && make install
 COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
 COPY --from=builder /root/bin/* /usr/local/bin/
 ENTRYPOINT /usr/local/bin/ffmpeg
