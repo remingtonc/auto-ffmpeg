@@ -1,4 +1,5 @@
 FROM docker.io/intel/oneapi-basekit AS builder
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update -qq \
     && apt-get -y install \
         autoconf \
@@ -76,5 +77,6 @@ RUN cd ~/ffmpeg_sources \
     && hash -r
 
 FROM docker.io/intel/oneapi-basekit
-COPY --from=builder /root/bin/ffmpeg /usr/local/bin/ffmpeg
+COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
+COPY --from=builder /root/bin/* /usr/local/bin/
 ENTRYPOINT /usr/local/bin/ffmpeg
