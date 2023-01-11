@@ -26,12 +26,14 @@ RUN apt-get update -qq \
         yasm \
         zlib1g-dev \
     && mkdir -p ~/ffmpeg_sources ~/bin
+# nasm is 2.15 in jammy so has avx-512 and unlikely to have qs specials, just install
+RUN apt-get install -y nasm libfdk-aac-dev
 # Compile libx264
 RUN cd ~/ffmpeg_sources \
     && git -C x264 pull 2> /dev/null || git clone --depth 1 https://code.videolan.org/videolan/x264.git \
     && cd x264 \
     && PATH="$HOME/bin:$PATH" PKG_CONFIG_PATH="$HOME/ffmpeg_build/lib/pkgconfig" ./configure --prefix="$HOME/ffmpeg_build" --bindir="$HOME/bin" --enable-static --enable-pic \
-    && PATH="$HOME/bin:$PATH" make \
+    && PATH="$HOME/bin:$PATH" make -j$(($(nproc)-1)) \
     && make install
 # Compile libx265
 RUN apt-get install libnuma-dev \
@@ -40,24 +42,16 @@ RUN apt-get install libnuma-dev \
     && tar xjvf x265.tar.bz2 \
     && cd multicoreware*/build/linux \
     && PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/ffmpeg_build" -DENABLE_SHARED=off ../../source \
-    && PATH="$HOME/bin:$PATH" make \
+    && PATH="$HOME/bin:$PATH" make -j$(($(nproc)-1)) \
     && make install
-# Compile libfdk-aac
-RUN cd ~/ffmpeg_sources \
-    && git -C fdk-aac pull 2> /dev/null || git clone --depth 1 https://github.com/mstorsjo/fdk-aac \
-    && cd fdk-aac \
-    && autoreconf -fiv \
-    && ./configure --prefix="$HOME/ffmpeg_build" --disable-shared \
-    && make \
-    && make install
-# Compile libvmaf
+# Compile libvmaf because it seems nifty
 RUN cd ~/ffmpeg_sources \
     && wget https://github.com/Netflix/vmaf/archive/v2.1.1.tar.gz \
     && tar xvf v2.1.1.tar.gz \
     && mkdir -p vmaf-2.1.1/libvmaf/build \
     && cd vmaf-2.1.1/libvmaf/build \
     && meson setup -Denable_tests=false -Denable_docs=false --buildtype=release --default-library=static .. --prefix "$HOME/ffmpeg_build" --bindir="$HOME/bin" --libdir="$HOME/ffmpeg_build/lib" \
-    && ninja \
+    && ninja -j$(($(nproc)-1)) \
     && ninja install
 # Compile ffmpeg with only a couple enabled features
 RUN cd ~/ffmpeg_sources \
@@ -78,9 +72,11 @@ RUN cd ~/ffmpeg_sources \
         --enable-libx264 \
         --enable-libx265 \
         --enable-libvpl \
+        --enable-libvmaf \
         --enable-gnutls \
+        --enable-libass \
         --enable-libfreetype \
-    && PATH="$HOME/bin:$PATH" make \
+    && PATH="$HOME/bin:$PATH" make -j$(($(nproc)-1)) \
     && make install \
     && hash -r
 
