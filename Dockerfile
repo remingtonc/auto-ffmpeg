@@ -10,14 +10,8 @@ RUN apt-get update -qq \
         libfreetype6-dev \
         libgnutls28-dev \
         libmp3lame-dev \
-        libsdl2-dev \
         libtool \
-        libva-dev \
-        libvdpau-dev \
         libvorbis-dev \
-        libxcb1-dev \
-        libxcb-shm0-dev \
-        libxcb-xfixes0-dev \
         meson \
         ninja-build \
         pkg-config \
@@ -25,7 +19,8 @@ RUN apt-get update -qq \
         wget \
         yasm \
         zlib1g-dev \
-        libgnutls28-dev \
+        gnutls \
+        libunistring-dev \
     && mkdir -p ~/ffmpeg_sources ~/bin
 # nasm is 2.15 in jammy so has avx-512 and unlikely to have qs specials, just install
 RUN apt-get install -y nasm libfdk-aac-dev
