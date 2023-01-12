@@ -103,6 +103,11 @@ RUN apt-get update \
     && cmake .. \
     && make -j1 \
     && make install
+# More trying
+RUN apt-get -y install \
+  intel-opencl-icd \
+  intel-level-zero-gpu level-zero \
+  intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2
 COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
 COPY --from=builder /root/bin/* /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/ffmpeg"]
