@@ -79,6 +79,7 @@ RUN cd ~/ffmpeg_sources \
         --enable-libfdk-aac \
         --enable-libx264 \
         --enable-libx265 \
+        --enable-vaapi \
         --enable-libvpl \
         --enable-libvmaf \
         --enable-gnutls \
