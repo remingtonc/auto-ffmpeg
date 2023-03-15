@@ -1,0 +1,1 @@
+podman build --tag makemkv-linux makemkv/

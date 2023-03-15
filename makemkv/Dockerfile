@@ -12,8 +12,9 @@ RUN apt-get update -qq \
         qtbase5-dev \
         zlib1g-dev
 RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
+    && tar xzf makemkv-bin-1.17.3.tar.gz \
     && wget https://www.makemkv.com/download/makemkv-oss-1.17.3.tar.gz \
-    && tar xzf *.tar.gz \
+    && tar xzf makemkv-oss-1.17.3.tar.gz \
     && cd makemkv-oss-1.17.3 \
     && PKG_CONFIG_PATH=/root/ffmpeg_build/lib/pkgconfig ./configure \
     && make && make install \
