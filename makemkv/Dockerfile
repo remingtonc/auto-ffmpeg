@@ -101,7 +101,8 @@ RUN apt-get update -qq \
         libexpat1-dev \
         libgl1-mesa-dev \
         qtbase5-dev \
-        zlib1g-dev
+        zlib1g-dev \
+        less
 # Includes av_mallocz_array fix https://forum.makemkv.com/forum/viewtopic.php?f=3&t=30396
 RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
     && tar xzf makemkv-bin-1.17.3.tar.gz \
@@ -113,6 +114,7 @@ RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
     && make && make install \
     && cd .. \
     && cd makemkv-bin-1.17.3 \
+    && echo accepted > tmp/eula_accepted \
     && make && make install
 ENTRYPOINT [ "/usr/bin/makemkvcon" ]
 CMD [ "-h" ]
