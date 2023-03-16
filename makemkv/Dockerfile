@@ -102,11 +102,13 @@ RUN apt-get update -qq \
         libgl1-mesa-dev \
         qtbase5-dev \
         zlib1g-dev
+# Includes av_mallocz_array fix https://forum.makemkv.com/forum/viewtopic.php?f=3&t=30396
 RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
     && tar xzf makemkv-bin-1.17.3.tar.gz \
     && wget https://www.makemkv.com/download/makemkv-oss-1.17.3.tar.gz \
     && tar xzf makemkv-oss-1.17.3.tar.gz \
     && cd makemkv-oss-1.17.3 \
+    && sed -i 's/av_mallocz_array/av_calloc/g' libffabi/src/ffabi.c \
     && PKG_CONFIG_PATH=/root/ffmpeg_build/lib/pkgconfig ./configure \
     && make && make install \
     && cd .. \
