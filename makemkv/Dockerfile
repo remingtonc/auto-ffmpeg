@@ -114,7 +114,7 @@ RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
     && make && make install \
     && cd .. \
     && cd makemkv-bin-1.17.3 \
-    && echo accepted > tmp/eula_accepted \
+    && mkdir tmp && echo accepted > tmp/eula_accepted \
     && make && make install
 ENTRYPOINT [ "/usr/bin/makemkvcon" ]
 CMD [ "-h" ]
