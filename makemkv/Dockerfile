@@ -21,6 +21,7 @@ RUN apt-get update -qq \
         yasm \
         zlib1g-dev \
         libunistring-dev \
+        libvpl-dev \
     && mkdir -p ~/ffmpeg_sources ~/bin
 # nasm is 2.15 in jammy so has avx-512 and unlikely to have qs specials, just install
 RUN apt-get install -y nasm libfdk-aac-dev
@@ -55,11 +56,12 @@ RUN apt-get update \
         cmake \
         libdrm-dev libdrm-intel1 \
         libva-dev libva2 libva-drm2 \
+        libvpl-dev \
     && git clone https://github.com/oneapi-src/oneVPL-intel-gpu ~/onevpl-gpu \
     && cd ~/onevpl-gpu \
     && mkdir build && cd build \
     && cmake .. \
-    && make -j1 \
+    && make -j$(($(nproc)-1)) \
     && make install
 # Compile ffmpeg with only a couple enabled features
 RUN cd ~/ffmpeg_sources \
@@ -103,18 +105,19 @@ RUN apt-get update -qq \
         qtbase5-dev \
         zlib1g-dev \
         less
-# Includes av_mallocz_array fix https://forum.makemkv.com/forum/viewtopic.php?f=3&t=30396
-RUN wget https://www.makemkv.com/download/makemkv-bin-1.17.3.tar.gz \
-    && tar xzf makemkv-bin-1.17.3.tar.gz \
-    && wget https://www.makemkv.com/download/makemkv-oss-1.17.3.tar.gz \
-    && tar xzf makemkv-oss-1.17.3.tar.gz \
-    && cd makemkv-oss-1.17.3 \
-    && sed -i 's/av_mallocz_array/av_calloc/g' libffabi/src/ffabi.c \
+# Patch to fix makemkv and ffmpeg incompatibilities. https://forum.makemkv.com/forum/viewtopic.php?f=3&t=37772
+COPY makemkv-oss-1.18.1-ffabi.c.patch /tmp/
+RUN wget https://www.makemkv.com/download/makemkv-bin-1.18.1.tar.gz \
+    && tar xzf makemkv-bin-1.18.1.tar.gz \
+    && wget https://www.makemkv.com/download/makemkv-oss-1.18.1.tar.gz \
+    && tar xzf makemkv-oss-1.18.1.tar.gz \
+    && cd makemkv-oss-1.18.1 \
+    && patch libffabi/src/ffabi.c /tmp/makemkv-oss-1.18.1-ffabi.c.patch && rm /tmp/makemkv-oss-1.18.1-ffabi.c.patch \
     && PKG_CONFIG_PATH=/root/ffmpeg_build/lib/pkgconfig ./configure \
-    && make && make install \
+    && make -j$(($(nproc)-1)) && make install \
     && cd .. \
-    && cd makemkv-bin-1.17.3 \
+    && cd makemkv-bin-1.18.1 \
     && mkdir tmp && echo accepted > tmp/eula_accepted \
-    && make && make install
+    && make -j$(($(nproc)-1)) && make install
 ENTRYPOINT [ "/usr/bin/makemkvcon" ]
 CMD [ "-h" ]

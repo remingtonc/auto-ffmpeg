@@ -1,0 +1,50 @@
+--- ffabi.c 2025-04-05 10:13:02.000000000 -0700
++++ ffabi.c 2025-05-11 01:32:20.691298362 -0700
+@@ -211,8 +211,7 @@
+     av_packet_free(&ctx->pck);
+
+     if (ctx->avctx) {
+-        avcodec_close(ctx->avctx);
+-        av_free(ctx->avctx);
++        avcodec_free_context(ctx->avctx);
+     }
+
+     av_free(ctx);
+@@ -374,7 +373,7 @@
+ #endif
+
+     ctx->avctx->profile = (info->profile != FFM_PROFILE_UNKNOWN) ?
+-        info->profile : FF_PROFILE_UNKNOWN;
++        info->profile : AV_PROFILE_UNKNOWN;
+
+     if ((CodecFlags&FFM_CODEC_FLAG_GLOBAL_HEADER)!=0)
+         ctx->avctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+@@ -420,8 +419,7 @@
+     av_freep(&ctx->frame_extended_data);
+
+     if (ctx->avctx) {
+-        avcodec_close(ctx->avctx);
+-        av_free(ctx->avctx);
++        avcodec_free_context(ctx->avctx);
+     }
+
+     av_free(ctx);
+@@ -604,7 +602,7 @@
+     info->capabilities = codec->capabilities;
+     if (codec->profiles) {
+         for (i=0;i<32;i++) {
+-            if (codec->profiles[i].profile==FF_PROFILE_UNKNOWN)
++            if (codec->profiles[i].profile==AV_PROFILE_UNKNOWN)
+                 break;
+             info->profiles_names[i]=codec->profiles[i].name;
+             info->profiles_values[i]=codec->profiles[i].profile;
+@@ -695,8 +693,7 @@
+     }
+
+     if (avctx) {
+-        avcodec_close(avctx);
+-        av_free(avctx);
++        avcodec_free_context(avctx);
+     }
+     return err;
+ }

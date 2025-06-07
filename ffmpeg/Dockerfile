@@ -55,11 +55,12 @@ RUN apt-get update \
         cmake \
         libdrm-dev libdrm-intel1 \
         libva-dev libva2 libva-drm2 \
+        libvpl-dev \
     && git clone https://github.com/oneapi-src/oneVPL-intel-gpu ~/onevpl-gpu \
     && cd ~/onevpl-gpu \
     && mkdir build && cd build \
     && cmake .. \
-    && make -j1 \
+    && make -j$(($(nproc)-1)) \
     && make install
 # Compile ffmpeg with only a couple enabled features
 RUN cd ~/ffmpeg_sources \
@@ -92,23 +93,31 @@ RUN cd ~/ffmpeg_sources \
 FROM docker.io/intel/oneapi-basekit
 # What we didn't compile ends up needing to be installed
 RUN apt-get update && apt-get -y install libass9 libfdk-aac2 libnuma1
+RUN mkdir /tmp/neo && cd /tmp/neo \
+    && wget https://github.com/intel/intel-graphics-compiler/releases/download/v2.11.7/intel-igc-core-2_2.11.7+19146_amd64.deb \
+    && wget https://github.com/intel/intel-graphics-compiler/releases/download/v2.11.7/intel-igc-opencl-2_2.11.7+19146_amd64.deb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/intel-ocloc-dbgsym_25.18.33578.6-0_amd64.ddeb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/intel-ocloc_25.18.33578.6-0_amd64.deb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/intel-opencl-icd-dbgsym_25.18.33578.6-0_amd64.ddeb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/intel-opencl-icd_25.18.33578.6-0_amd64.deb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/libigdgmm12_22.7.0_amd64.deb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/libze-intel-gpu1-dbgsym_25.18.33578.6-0_amd64.ddeb \
+    && wget https://github.com/intel/compute-runtime/releases/download/25.18.33578.6/libze-intel-gpu1_25.18.33578.6-0_amd64.deb \
+    && dpkg -i *.deb \
+    && cd ~/ && rm -rf /tmp/neo
 # Uhh let's try installing the GPU kit
 RUN apt-get update \
     && apt-get -y install \
         cmake \
         libdrm-dev libdrm-intel1 \
         libva-dev libva2 libva-drm2 \
+        intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2 \
     && git clone https://github.com/oneapi-src/oneVPL-intel-gpu ~/onevpl-gpu \
     && cd ~/onevpl-gpu \
     && mkdir build && cd build \
     && cmake .. \
-    && make -j1 \
+    && make -j$(($(nproc)-1)) \
     && make install
-# More trying
-RUN apt-get -y install \
-  intel-opencl-icd \
-  intel-level-zero-gpu level-zero \
-  intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2
 COPY --from=builder /root/ffmpeg_build /root/ffmpeg_build
 COPY --from=builder /root/bin/* /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/ffmpeg"]
