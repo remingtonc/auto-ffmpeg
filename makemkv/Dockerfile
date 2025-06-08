@@ -119,5 +119,7 @@ RUN wget https://www.makemkv.com/download/makemkv-bin-1.18.1.tar.gz \
     && cd makemkv-bin-1.18.1 \
     && mkdir tmp && echo accepted > tmp/eula_accepted \
     && make -j$(($(nproc)-1)) && make install
+COPY keydb.cfg /root/.MakeMKV/KEYDB.cfg
+COPY settings_with_key.conf /root/.MakeMKV/settings.conf
 ENTRYPOINT [ "/usr/bin/makemkvcon" ]
 CMD [ "-h" ]
