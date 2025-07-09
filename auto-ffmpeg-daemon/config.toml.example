@@ -1,0 +1,8 @@
+target_path = "/path/to/target"
+optical_drive_path = "/dev/cdrom"
+check_interval_secs = 10
+smtp_host = "smtp.xyzzzzz"
+smtp_username = "xxxx"
+smtp_password = "yyyy"
+email_from = "xxxx@xxxx.xyzzzzz"
+email_to = "yyyy@yyyy.xyzzzzz"
